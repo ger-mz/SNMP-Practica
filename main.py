@@ -3,11 +3,15 @@ from pysnmp.hlapi import *
 from fpdf import FPDF
 import os
 MIB = '1.3.6.1.2.1'
-ip, puerto, comunidad = 0, 0 ,0
-
+ip, puerto, comunidad, version = 0, 0 ,0, 0
+encabezado = '''    \tSistema de Administración de Red
+     Práctica 1 - Adquisición de información
+    Gerardo Martínez Medrano\t 4CM13\t 2020630297'''
+# print(encabezado)
 def agregarAgente():
     ip = input("Ingresa la ip: ")
     puerto = input("Ingresa el puerto: ")
+    version = input("Ingresa la version: ")
     comunidad = input("ingresa la comunidad: ")
     try:
         file = open("agentes.csv", "r", encoding="utf8")
@@ -22,7 +26,7 @@ def agregarAgente():
         file.close()
 
     file = open("agentes.csv", "a", encoding="utf8")
-    file.write(ip + ', ' + puerto + ', ' + comunidad+'\n')
+    file.write(ip + ', ' + puerto + ', ' + comunidad+', '+version+'\n')
 
     file.close()
 
@@ -48,7 +52,7 @@ def eliminarAgete():
     # print agentes
     lista, contador = mostrarAgentesGuardados()
     agente = int(input("Ingresa el id del agenete que quieres eliminar: "))
-    if agente == -1 or agente < -1 or agente > contador:
+    if agente <= -1 or agente > contador:
         print('\nOperacion Cancelada\n')
         return
 
@@ -98,16 +102,23 @@ def getAgenteId(ageneteLista, id):
 def pdfGenerator(interfaceInfo):
     pdf = FPDF()
     pdf.add_page()
+    pdf.set_font('Times', 'B', 16)
+
+    head = encabezado.split('\n')
+    pdf.cell(0, 10, '        ' + head[0], 0, 1)
+    pdf.cell(0, 10, '     ' + head[1], 0, 1)
+    pdf.cell(0, 10, head[2], 0, 1)
+
     pdf.set_font('Times', '', 12)
-    if search('windows', interfaceInfo[1], IGNORECASE):
+    if search('windows', interfaceInfo[0], IGNORECASE):
         pdf.image('images/Windows8.jpeg', 170, 8, 33)
 
-    if search('ubuntu', interfaceInfo[1], IGNORECASE):
+    if search('ubuntu', interfaceInfo[0], IGNORECASE):
         pdf.image('images/ubuntu.png', 170, 8, 33)
 
     for info in interfaceInfo:
         pdf.cell(0, 10, info, 0, 1)
-    pdfname = interfaceInfo[0]
+    pdfname = interfaceInfo[1]
     pdf.output(pdfname[pdfname.find(':') + 2:] + '.pdf', 'F')
 
 def generarReporte():
@@ -123,30 +134,34 @@ def generarReporte():
 
     print('')
 
-    global ip, puerto, comunidad
-    ip, puerto, comunidad = getAgenteId(lista, agente-1)
-    ip, puerto, comunidad = ip.strip(), puerto.strip(), comunidad.strip()
-
-    # nombre / hostname
-    interfaceInfo.append('Hostname: '+str(getDatos(MIB+'.1.5.0')))
-    print(interfaceInfo[0])
+    global ip, puerto, comunidad, version
+    ip, puerto, comunidad, version = getAgenteId(lista, agente-1)
+    ip, puerto, comunidad, version = ip.strip(), puerto.strip(), comunidad.strip(), version.strip()
 
     # S.O (version, logo), solo funciona con windows y ubuntu
     sistemaOperativo = str(getDatos(MIB+'.1.1.0')).split()
     for x in sistemaOperativo:
         if search('windows', x, IGNORECASE) or search('ubuntu', x, IGNORECASE):
             interfaceInfo.append('Sistema Operativo: ' + x)
-            print(interfaceInfo[1])
+            print(interfaceInfo[0])
             break
+
+    # nombre / hostname
+    interfaceInfo.append('Hostname: ' + str(getDatos(MIB + '.1.5.0')))
+    print(interfaceInfo[1])
+
+    # informacion de contacto
+    interfaceInfo.append('Contacto: '+ str(getDatos(MIB + '.1.4.0')))
+    print(interfaceInfo[2])
 
     # ubicacion
     interfaceInfo.append('Ubicacion: ' + str(getDatos(MIB+'.1.6.0')))
-    print(interfaceInfo[2])
+    print(interfaceInfo[3])
 
     # numero de interfaces
     numeroIntefaces = getDatos(MIB+'.2.1.0')
     interfaceInfo.append('Numero de Interfaces: '+ str(numeroIntefaces))
-    print(interfaceInfo[3])
+    print(interfaceInfo[4])
 
     # Estatus de las interfaces
     # Nombre de las interfaces
@@ -156,7 +171,7 @@ def generarReporte():
         status = getDatos(MIB + '.2.2.1.7.' + str(i))
         interfaceInfo.append('Interface %d: %s' % (i, str(name)) +
               ' Estatus: ' + ('up' if status == 1 else 'down' if status == 2 else 'testing'))
-        print(interfaceInfo[(3+i)])
+        print(interfaceInfo[(4+i)])
         if i > 4:
             break
 
@@ -171,11 +186,12 @@ def generarReporte():
 
 if __name__ == '__main__':
     while True :
-        print('-----Inicio-----')
+        print(encabezado)
+        print('-------------------------Inicio-------------------------')
         print('Selecciona una de las siguientes opciones: ')
-        print('1. Agregar Agenete')
-        print('2. Eliminar Agente')
-        print('3. Generar Reporte')
+        print('\t1. Agregar Agenete')
+        print('\t2. Eliminar Agente')
+        print('\t3. Generar Reporte')
         opcion = input('Ingresa una opcion, -1 para terminar proceso: ')
 
         if opcion == '1':
@@ -190,9 +206,6 @@ if __name__ == '__main__':
         elif opcion == '-1':
             break
         else:
-            os.system("cls")
+            # os.system("cls")
+            # os.system("clear")
             print('\nError opcion no valida\n')
-
-    # Recordar como cambiar la comunidad
-    # Revisar net-snmp.org ejecutable getsnmpget
-    # Instalaciones necesarias pysnmp fpdf
