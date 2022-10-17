@@ -1,6 +1,7 @@
 from re import search, IGNORECASE
 from pysnmp.hlapi import *
 from fpdf import FPDF
+from time import strftime
 import os
 MIB = '1.3.6.1.2.1'
 ip, puerto, comunidad, version = 0, 0 ,0, 0
@@ -119,7 +120,7 @@ def pdfGenerator(interfaceInfo):
     for info in interfaceInfo:
         pdf.cell(0, 10, info, 0, 1)
     pdfname = interfaceInfo[1]
-    pdf.output(pdfname[pdfname.find(':') + 2:] + '.pdf', 'F')
+    pdf.output(pdfname[pdfname.find(':') + 2:] + str(strftime("%H:%M:%S")) + '.pdf', 'F')
 
 def generarReporte():
     # seleccionar agente, enviar solicitudes snmp para solicitar informacion
@@ -140,6 +141,7 @@ def generarReporte():
 
     # S.O (version, logo), solo funciona con windows y ubuntu
     sistemaOperativo = str(getDatos(MIB+'.1.1.0')).split()
+    # interfaceInfo.append('Sistema operativo:')
     for x in sistemaOperativo:
         if search('windows', x, IGNORECASE) or search('ubuntu', x, IGNORECASE):
             interfaceInfo.append('Sistema Operativo: ' + x)
