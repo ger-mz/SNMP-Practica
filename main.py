@@ -117,10 +117,13 @@ def pdfGenerator(interfaceInfo):
     if search('ubuntu', interfaceInfo[0], IGNORECASE):
         pdf.image('images/ubuntu.png', 170, 8, 33)
 
+    if search('linux', interfaceInfo[0], IGNORECASE):
+        pdf.image('images/linux.jpg', 170, 8, 33)
+
     for info in interfaceInfo:
         pdf.cell(0, 10, info, 0, 1)
     pdfname = interfaceInfo[1]
-    pdf.output(pdfname[pdfname.find(':') + 2:] + str(strftime("%H:%M:%S")) + '.pdf', 'F')
+    pdf.output(pdfname[pdfname.find(':') + 2:] + str(strftime(" Hora %H Min %M segundos %S")) + '.pdf', 'F')
 
 def generarReporte():
     # seleccionar agente, enviar solicitudes snmp para solicitar informacion
@@ -143,10 +146,11 @@ def generarReporte():
     sistemaOperativo = str(getDatos(MIB+'.1.1.0')).split()
     # interfaceInfo.append('Sistema operativo:')
     for x in sistemaOperativo:
-        if search('windows', x, IGNORECASE) or search('ubuntu', x, IGNORECASE):
+        if search('windows', x, IGNORECASE) or search('ubuntu', x, IGNORECASE) or search('linux', x, IGNORECASE):
             interfaceInfo.append('Sistema Operativo: ' + x)
             print(interfaceInfo[0])
             break
+
 
     # nombre / hostname
     interfaceInfo.append('Hostname: ' + str(getDatos(MIB + '.1.5.0')))
