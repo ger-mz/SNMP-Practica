@@ -183,8 +183,8 @@ def generarReporte():
             break
 
     # tiempo de actividad
-    # interfaceInfo.append('Tiempo de Actividad de red : %s %s' %(str(getDatos(MIB+'.1.3.0')//6000), 'Minutos'))
-    # print(interfaceInfo[len(interfaceInfo)-1])
+    interfaceInfo.append('Tiempo de Actividad : %s %s' %(str(getDatos(MIB+'.1.3.0')), 'hundredths of senconds'))
+    print(interfaceInfo[len(interfaceInfo)-1])
 
     # Generador de reporte pdf con el nombre del hostname
     pdfGenerator(interfaceInfo)
