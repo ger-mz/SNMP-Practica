@@ -122,6 +122,7 @@ def pdfGenerator(interfaceInfo):
 
     for info in interfaceInfo:
         pdf.cell(0, 10, info, 0, 1)
+
     pdfname = interfaceInfo[1]
     pdf.output(pdfname[pdfname.find(':') + 2:] + str(strftime(" Hora %H Min %M segundos %S")) + '.pdf', 'F')
 
@@ -182,8 +183,8 @@ def generarReporte():
             break
 
     # tiempo de actividad
-    interfaceInfo.append('Tiempo de Actividad: %d %s' %(getDatos(MIB+'.1.3.0')//6000, 'Minutos'))
-    print(interfaceInfo[len(interfaceInfo)-1])
+    # interfaceInfo.append('Tiempo de Actividad de red : %s %s' %(str(getDatos(MIB+'.1.3.0')//6000), 'Minutos'))
+    # print(interfaceInfo[len(interfaceInfo)-1])
 
     # Generador de reporte pdf con el nombre del hostname
     pdfGenerator(interfaceInfo)
@@ -212,6 +213,6 @@ if __name__ == '__main__':
         elif opcion == '-1':
             break
         else:
-            # os.system("cls")
+            os.system("cls")
             # os.system("clear")
             print('\nError opcion no valida\n')
