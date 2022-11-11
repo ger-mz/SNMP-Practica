@@ -298,8 +298,16 @@ def reporteContabilidad():
     dataS = ["multicas", "paquetesIP", "paquetesICMP", "segmentosTCP", "datagramas"]
     msg = ["Paquetes Multicast", "Paquetes IP", "Mensajes ICMP", "Segmentos Retransmitidos TCP", "Datagramas enviados"]
 
+    print("El tiempo inicia en:",inicio)
+    print("El tiempo termina en:",final)
+    settime = input("Para ingresar inicio y termino personalisado ingresa 1: ")
+
+    if int(settime) == 1:
+        inicio = input("Ingresa el tiempo inicial: ")
+        final = input("Ingresa el tiempo final: ")
+
     for i in range(0, 5):
-        creargraficas("graficas/grafica"+str(i+1)+".png", str(int(inicio)+1200), str(final), dataS[i], narchivo, msg[i])
+        creargraficas("graficas/grafica"+str(i+1)+".png", str(inicio), str(final), dataS[i], narchivo, msg[i])
 
     pdf = FPDF()
     pdf.add_page()
