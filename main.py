@@ -200,14 +200,14 @@ def generarReporte():
 def createRRD(filename):
     ret = rrdtool.create(str(filename)+".rrd",
                      "--start",'N',
-                     "--step",'60',
+                     "--step",'300',
                      "DS:multicas:COUNTER:120:U:U",
                      "DS:paquetesIP:COUNTER:120:U:U",
                      "DS:paquetesICMP:COUNTER:120:U:U",
                      "DS:segmentosTCP:COUNTER:120:U:U",
                      "DS:datagramas:COUNTER:120:U:U",
                      "RRA:AVERAGE:0.5:6:100",
-                     "RRA:AVERAGE:0.5:1:200")
+                     "RRA:AVERAGE:0.5:1:300")
 
     if ret:
         print(rrdtool.error())
@@ -216,8 +216,8 @@ def updateRRD():
     global globaltime, rrdfilename
     print("Inicion de Update")
     while time.time() < globaltime:
-        # multicas = str(getDatos('1.3.6.1.2.1.2.2.1.18.55'))  # 12.4 getsmulticast
-        multicas = str(getDatos('1.3.6.1.2.1.2.2.1.18.38'))  # 12.4 getsmulticast
+        multicas = str(getDatos('1.3.6.1.2.1.2.2.1.18.55'))  # 12.4 getsmulticast
+        # multicas = str(getDatos('1.3.6.1.2.1.2.2.1.18.38'))  # 12.4 getsmulticast
         paquetesIP = str(getDatos('1.3.6.1.2.1.4.10.0'))
         paquetesICMP = str(getDatos('1.3.6.1.2.1.5.1.0'))
         segmentosTCP = str(getDatos('1.3.6.1.2.1.6.12.0'))
@@ -226,7 +226,7 @@ def updateRRD():
         valor = "N:" + str(multicas) + ':' + str(paquetesIP) + ':' + str(paquetesICMP) + ':' + str(
             segmentosTCP) + ':' + str(datagramas)
 
-        print(valor)
+        # print(valor)
 
         rrdtool.update(rrdfilename+'.rrd', valor)
         rrdtool.dump(rrdfilename+'.rrd', rrdfilename+'.xml')
@@ -259,7 +259,7 @@ def iniciarMonitoreo():
     tiempo = int(time.time())
     tiempofinal = tiempo + int(secondstime)
 
-    print('Tiempo final:',tiempofinal)
+    print('Tiempo final:',str(tiempofinal))
     globaltime = tiempofinal
 
     t = Thread(name='updaterrd', target=updateRRD)
@@ -299,7 +299,7 @@ def reporteContabilidad():
     msg = ["Paquetes Multicast", "Paquetes IP", "Mensajes ICMP", "Segmentos Retransmitidos TCP", "Datagramas enviados"]
 
     for i in range(0, 5):
-        creargraficas("graficas/grafica"+str(i+1)+".png", str(inicio), str(final), dataS[i], narchivo, msg[i])
+        creargraficas("graficas/grafica"+str(i+1)+".png", str(int(inicio)+1200), str(final), dataS[i], narchivo, msg[i])
 
     pdf = FPDF()
     pdf.add_page()
@@ -319,30 +319,10 @@ def reporteContabilidad():
     pdf.cell(0, 5, "rdate: "+strftime("%d %b %Y %H:%M:%S"), 0, 1)
     pdf.cell(0, 5, "#User-name", 0, 1)
     pdf.cell(0, 5, "1:"+str(getDatos("1.3.6.1.2.1.1.4.0")), 0, 1)
-    pdf.cell(0, 5, "#Acct-Input-Octets", 0, 1)
-    pdf.cell(0, 5, "42:"+str(getDatos("1.3.6.1.2.1.2.2.1.10.33")), 0, 1)
-    pdf.cell(0, 5, "#Acct-Output-Octets", 0, 1)
-    pdf.cell(0, 5, "43:"+str(getDatos("1.3.6.1.2.1.2.2.1.16.33")), 0, 1)
-    pdf.cell(0, 5, "#Acct-Input-Packets", 0, 1)
-    pdf.cell(0, 5, "47:"+str(getDatos("1.3.6.1.2.1.2.2.1.12.55")), 0, 1)
-    pdf.cell(0, 5, "#Acct-Output-Packets", 0, 1)
-    pdf.cell(0, 5, "48:"+str(getDatos("1.3.6.1.2.1.2.2.1.17.55")), 0, 1)
-
-    # MONITOREADO
-    # pdf.cell(0, 5, "#Multicast", 0, 1)
-    # pdf.cell(0, 5, "18:"+str(getDatos('1.3.6.1.2.1.2.2.1.18.55')), 0, 1)
-    # pdf.cell(0, 5, "#Paquete-IP", 0, 1)
-    # pdf.cell(0, 5, "10:"+str(getDatos('1.3.6.1.2.1.4.10.0')), 0, 1)
-    # pdf.cell(0, 5, "#Mensajes-ICMP", 0, 1)
-    # pdf.cell(0, 5, "1:"+str(getDatos('1.3.6.1.2.1.5.1.0')), 0, 1)
-    # pdf.cell(0, 5, "#Segmentos-Retransmitidos", 0, 1)
-    # pdf.cell(0, 5, "12:"+str(getDatos('1.3.6.1.2.1.6.12.0')), 0, 1)
-    # pdf.cell(0, 5, "#Datagramas Enviados", 0, 1)
-    # pdf.cell(0, 5, "4:"+str(getDatos('1.3.6.1.2.1.7.4.0')), 0, 1)
 
     pdf.cell(0, 5, '', 0, 1)
 
-    contador, pos = 0, 130
+    contador, pos = 0, 90
     for i in msg:
         if contador == 3:
             pdf.add_page()

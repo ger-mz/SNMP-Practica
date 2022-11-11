@@ -5,7 +5,6 @@ tiempo_actual = int(time.time())
 #Grafica desde el tiempo actual menos diez minutos
 tiempo_inicial = tiempo_actual - 600
 
-
 ret = rrdtool.graph( "traficoRED.png",
                      "--start",str(tiempo_inicial),
                      "--end","N",

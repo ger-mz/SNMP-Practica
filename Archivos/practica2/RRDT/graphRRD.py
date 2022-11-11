@@ -5,6 +5,7 @@ tiempo_actual = int(time.time())
 #Grafica desde el tiempo actual menos diez minutos
 tiempo_inicial = tiempo_actual - 1800
 
+
 ret = rrdtool.graphv( "practica2.png",
                      "--start",str(tiempo_inicial),
                      "--end","N",
