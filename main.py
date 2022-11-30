@@ -1,12 +1,8 @@
 from file import agregarAgente, eliminarAgete, getAgente, pdfGenerator, encabezado, getRRDFILE, pdfContabilidad
-from RRDT import createRRD, updateRRD, creargraficas
-import time
+from RRDT import createRRD, updateRRD, creargraficas, updateRendimiento, createRRD_CPU_RAM_RED
 from re import search, IGNORECASE
-from time import strftime
-# from RRDT.rrdpy import RRDPY
 from threading import Thread
-from pysnmp.hlapi import *
-# import rrdtool
+import time
 import os
 
 def generarReporte():
@@ -20,7 +16,6 @@ def generarReporte():
     for x in sistemaOperativo: # interfaceInfo.append('Sistema operativo:')
         if search('windows', x, IGNORECASE) or search('ubuntu', x, IGNORECASE) or search('linux', x, IGNORECASE):
             interfaceInfo.append('Sistema Operativo: ' + x)
-            print(interfaceInfo[0])
             break
 
     interfaceInfo.append('Hostname: ' + str(snmpa.getDatos(MIB + '.1.5.0'))) # nombre / hostname
@@ -29,12 +24,11 @@ def generarReporte():
     numeroIntefaces = snmpa.getDatos(MIB + '.2.1.0')
     interfaceInfo.append('Numero de Interfaces: ' + str(numeroIntefaces)) # numero de interfaces
 
-    print('Estatus de las interfaces: ') # Estatus de las interfaces y nombre de las interfaces
-    for i in range(1, int(numeroIntefaces)+1):
+    for i in range(1, int(numeroIntefaces)+1): # Estatus de las interfaces y nombre de las interfaces
         name = snmpa.getDatos(MIB+'.2.2.1.2.'+str(i))
         status = snmpa.getDatos(MIB + '.2.2.1.7.' + str(i))
         interfaceInfo.append('Interface %d: %s' % (i, str(name)) +
-              ' Estatus: ' + ('up' if status == 1 else 'down' if status == 2 else 'testing'))
+                             ' Estatus: ' + ('up' if status == 1 else 'down' if status == 2 else 'testing'))
         # print(interfaceInfo[(4+i)])
         if i > 4:
             break
@@ -105,7 +99,6 @@ def reporteContabilidad():
 
 
 def contabilidad():
-    print('\n\n')
     print(encabezado)
     print('-------------------------CONTABILIDAD-------------------------')
     print('Selecciona una de las siguientes opciones: ')
@@ -120,9 +113,25 @@ def contabilidad():
     else:
         print("\n\nError\n\n")
 
+def monitorizarRendimiento():
+    print('Inicio de Monitoreo de CPU, RAM y RED')
+
+    secondstime = input("ingresa el tiempo en segundos para monitorear (10min == 600): ")
+    tiempofinal = int(time.time()) + int(secondstime)
+    print('El tiempo final sera:', str(tiempofinal))
+    filename = str(input('Ingresa el nombre del archivo rrd: '))
+
+    createRRD_CPU_RAM_RED('Datos/'+filename+'1', 'CPUMonitor', steps=1, RECMODE='LAST')
+    # createRRD_CPU_RAM_RED('Datos/'+filename+'2', 'RAMMonitor', steps=1)
+    # createRRD_CPU_RAM_RED('Datos/'+filename+'3', 'REDMonitor', steps=1, Modo='COUNTER', lw='U', up='U')
+    snmp = getAgente()
+
+    t = Thread(name='updateRendimiento', target=updateRendimiento, args=(tiempofinal, filename, snmp))
+    t.start()
+
+
 if __name__ == '__main__':
     while True :
-        print('\n\n')
         print(encabezado)
         print('-------------------------Inicio-------------------------')
         print('Selecciona una de las siguientes opciones: ')
@@ -130,6 +139,7 @@ if __name__ == '__main__':
         print('\t2. Eliminar Agente')
         print('\t3. Generar Reporte')
         print('\t4. Contabilidad de uso')
+        print('\t5. Monitorizar Rendimiento')
         opcion = input('Ingresa una opcion, -1 para terminar proceso: ')
 
         if opcion == '1':
@@ -144,10 +154,13 @@ if __name__ == '__main__':
         elif opcion == '4':
             contabilidad()
 
+        elif opcion == '5':
+            monitorizarRendimiento()
+
         elif opcion == '-1':
             break
 
         else:
-            os.system("cls")
-            # os.system("clear")
+            # os.system("cls")
+            os.system("clear")
             print('\nError opcion no valida\n')
