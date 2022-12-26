@@ -2,3 +2,4 @@
 /*.pdf
 /Archivos/*
 /graficas/*.png
+/__pycache__/*
