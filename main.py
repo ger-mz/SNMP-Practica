@@ -1,4 +1,5 @@
 from file import agregarAgente, eliminarAgete, getAgente, pdfGenerator, encabezado, getRRDFILE, pdfContabilidad
+from config import iniciarTap0, telnetConfigFile, mostarDirectorio, extractConfigFile, uploadFile
 from RRDT import createRRD, updateRRD, creargraficas, updateRendimiento, createRRD_CPU_RAM_RED
 from re import search, IGNORECASE
 from threading import Thread
@@ -122,17 +123,41 @@ def monitorizarRendimiento():
     filename = str(input('Ingresa el nombre del archivo rrd: '))
 
     createRRD_CPU_RAM_RED('Datos/'+filename+'1', 'CPUMonitor', steps=1, RECMODE='LAST')
-    # createRRD_CPU_RAM_RED('Datos/'+filename+'2', 'RAMMonitor', steps=1)
-    # createRRD_CPU_RAM_RED('Datos/'+filename+'3', 'REDMonitor', steps=1, Modo='COUNTER', lw='U', up='U')
+    createRRD_CPU_RAM_RED('Datos/'+filename+'2', 'RAMMonitor', steps=1)
+    createRRD_CPU_RAM_RED('Datos/'+filename+'3', 'REDMonitor', steps=1, Modo='COUNTER', lw='U', up='U')
     snmp = getAgente()
 
     t = Thread(name='updateRendimiento', target=updateRendimiento, args=(tiempofinal, filename, snmp))
     t.start()
 
+def configuracionCloud():
+    print(encabezado)
+    print('-------------------------CONFIGURACION-------------------------')
+    print('Selecciona una de las siguientes opciones: ')
+    print('\t1. Iniciar interfaz Tap0 de la red')
+    print('\t2. Conexion telnet generar Archivo de Configuracion')
+    print('\t3. Mostrar Archivos')
+    print('\t4. Extraer Archivo')
+    print('\t5. Surbir Archivo')
+    opcion = int(input('Ingresa una opcion, -1 para terminar proceso: '))
+
+    if opcion == 1:
+        iniciarTap0()
+    elif opcion == 2:
+        telnetConfigFile()
+    elif opcion == 3:
+        mostarDirectorio()
+    elif opcion == 4:
+        extractConfigFile()
+    elif opcion == 5:
+        uploadFile()
+    else:
+        print("\n\nError\n\n")
+
 
 if __name__ == '__main__':
     while True :
-        print(encabezado)
+        print('\n',encabezado)
         print('-------------------------Inicio-------------------------')
         print('Selecciona una de las siguientes opciones: ')
         print('\t1. Agregar Agenete')
@@ -140,7 +165,11 @@ if __name__ == '__main__':
         print('\t3. Generar Reporte')
         print('\t4. Contabilidad de uso')
         print('\t5. Monitorizar Rendimiento')
+        print('\t6. Configuracion Remota')
         opcion = input('Ingresa una opcion, -1 para terminar proceso: ')
+
+        os.system("clear")
+        # os.system("cls")
 
         if opcion == '1':
             agregarAgente()
@@ -156,11 +185,13 @@ if __name__ == '__main__':
 
         elif opcion == '5':
             monitorizarRendimiento()
+        
+        elif opcion == '6':
+            configuracionCloud()
 
         elif opcion == '-1':
+            print('\nPrograma Finalizado')
             break
 
         else:
-            # os.system("cls")
-            os.system("clear")
             print('\nError opcion no valida\n')

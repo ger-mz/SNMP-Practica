@@ -4,7 +4,7 @@ from time import strftime
 from fpdf import FPDF
 
 encabezado = '''    \tSistema de Administración de Red
-     Práctica 2 - Administración de Contabilidad
+     Práctica 4 - Administración de Contabilidad
     Gerardo Martínez Medrano\t 4CM13\t 2020630297'''
 
 def agregarAgente():
