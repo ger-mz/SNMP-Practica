@@ -3,21 +3,41 @@ from ftplib import FTP
 from time import sleep
 from os import system
 
-HOST, user, password = '30.30.30.1', 'rcp', 'rcp'
+HOST1, user, password, HOST2 = '30.30.30.1', 'rcp', 'rcp', '192.168.1.2'
+op = -1
+
+def selectIP():
+    global op
+    while True:
+        print("Selecciona un router: ")
+        print("1.",HOST1)
+        print("2.",HOST2)
+
+        op = int(input("Ingresa una opccion: "))
+        if(op == 1 or op == 2):
+            break
+    
 
 def uploadFile():
-    global HOST, user, password
-    filename = input("\ningresa el nombre del archivo: ").strip()
+    global HOST1, user, password, HOST2
+    selectIP()
+    HOST = HOST1 if op == 1 else HOST2
+
+    filename = input("\nIngresa el nombre del archivo: ").strip()
+    newname = input("Ingresa el nuevo nombre, -1 minsmo nombre, 0 nombre por default: ").strip()
+    newname = filename if newname == "-1" else 'startup-config' if newname == "0" else newname
 
     with FTP(HOST, user, password) as ftp:
         with open(filename, 'rb') as fp:
-            ftp.storbinary('STOR '+filename, fp)
+            ftp.storbinary('STOR '+newname, fp)
     
     print(f'\nArchivo {filename} subido al servidor')
 
 def extractConfigFile():
-    global HOST, user, password
+    global HOST1, user, password, HOST2
+
     mostarDirectorio()
+    HOST = HOST1 if op == 1 else HOST2
 
     filename = input("\ningresa el nombre del archivo: ").strip()
 
@@ -28,21 +48,21 @@ def extractConfigFile():
     print(f'\nArchivo {filename} descargado')
 
 def mostarDirectorio():
-    # HOST = '30.30.30.1'
-    # user = 'rcp'
-    # password = 'rcp'
-    global HOST, user, password
+    global HOST1, user, password, HOST2
+
+    selectIP()
+    HOST = HOST1 if op == 1 else HOST2
 
     with FTP(HOST, user, password) as ftp:
         print("\nLos archivos en el directorio son: \n")
         ftp.dir()
 
 def telnetConfigFile():
-    global HOST, user, password
-    # password = getpass.getpass()
-    # print('\n','pass: ',password, ' ', type(password))
-    # https://youtube.com/shorts/MEmV1FTk_YE?feature=share
+    global HOST1, user, password, HOST2
     
+    selectIP()
+    HOST = HOST1 if op == 1 else HOST2
+
     with Telnet(HOST) as tn:
         tn.read_until(b"User: ")
         tn.write(user.encode('ascii') + b"\n")
@@ -82,5 +102,5 @@ def iniciarTap0():
     system(f'sudo tunctl -u {usr}')
     system(f'sudo ifconfig tap0 {ip} up')
     system(f'sudo route add -net {net} netmask {nt} gw {gw} dev tap0')
-
+    system(f'sudo route add -net 192.168.1.0 netmask 255.255.255.0 gw 30.30.30.1 dev tap0')
     return

@@ -139,8 +139,6 @@ def configuracionCloud():
     print('\t3. Mostrar Archivos')
     print('\t4. Extraer Archivo')
     print('\t5. Surbir Archivo')
-    print('\t6. Configurar Router RCP-2')
-    print('\t7. Configurar Router RCP-1')
     opcion = int(input('Ingresa una opcion, -1 para terminar proceso: '))
 
     if opcion == 1:
@@ -153,10 +151,6 @@ def configuracionCloud():
         extractConfigFile()
     elif opcion == 5:
         uploadFile()
-    elif opcion == 6:
-        print("Por programar")
-    elif opcion == 7:
-        print("Por programar")
     else:
         print("\n\nError\n\n")
 
