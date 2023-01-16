@@ -1,0 +1,33 @@
+comunidad: comunidadTRAPS
+
+sudo service snmptrapd (start/stop/restart)
+sudo systemctl stop snmptrapd.socket
+
+Mostrar las trap en consola
+sudo snmptrapd -f -Lo -c /etc/snmp/snmptrapd.conf
+
+Alertas:
+	enterprice: generadas por el mismo desarrollador
+	genericas: cualquier agente puede emitirlas
+		Wan-start: si se reinicia
+		cold-start: is se apaga y se veulve a prender
+		link-down: si un cable se desconecta
+		authentication-failer: sin no se puede autenticar
+
+Simular alerta 
+snmptrap -v1 -c comunidadTRAPS localhost 1.2.4.5 192.168.202.5 2 0 "100" IF-MIB::ifIndex i 2
+
+snmp-server community public ro
+snmp-server host 192.168.1.2
+
+/etc/snmp/snmptrapd.conf
+snmp-server host 192,168.1.2 traps version 2c comunidadTRAPS
+
+tL
+    sudo systemctl stop snmp
+    sudo system ctl stop snmptrapd.socket
+    sudosnmptrap -f -Lo -c /etc .. conf
+    sudo service snmptrap stop
+    sudo snmptrap -f -Lo -c /etc .. conf
+
+dummycuenta3 pevownkjheqyazdn
