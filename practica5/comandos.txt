@@ -29,5 +29,3 @@ tL
     sudosnmptrap -f -Lo -c /etc .. conf
     sudo service snmptrap stop
     sudo snmptrap -f -Lo -c /etc .. conf
-
-dummycuenta3 pevownkjheqyazdn
